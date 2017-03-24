@@ -14,8 +14,8 @@ public interface UserDao extends JpaRepository<Users, Long>{
 	public Users findByUsername(String username);
 	
 	
-//	@Query(value = "SELECT u.username FROM Users u WHERE u.username LIKE %:pattern%")
-//	public List<String> findAllUsers(@Param("pattern") String pattern);
+	@Query(value = "SELECT u.username FROM Users u WHERE u.username LIKE %?1% ")
+	public List<String> findUsersLike(@Param("pattern") String pattern);
 	
 	public List<UsernameProjection> findByUsernameLike(String username);
 	

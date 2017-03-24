@@ -43,7 +43,7 @@ public class Messages {
 
 	public Messages() {}
 	
-	public int getId() {
+	public int getIdmessages() {
 		return idmessages;
 	}
 
@@ -53,7 +53,7 @@ public class Messages {
 
 	
 
-	public String getMessage_text() {
+	public String getMessageText() {
 		return messageText;
 	}
 
@@ -61,7 +61,7 @@ public class Messages {
 		this.messageText = message;
 	}
 
-	public Timestamp getSent_at() {
+	public Timestamp getSentAt() {
 		return sentAt;
 	}
 

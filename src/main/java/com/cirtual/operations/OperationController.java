@@ -6,13 +6,17 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+import org.mortbay.jetty.EncodedHttpURI;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+
 import com.cirtual.data.MessageDao;
+import com.cirtual.data.MessageProjection;
 import com.cirtual.data.Messages;
 import com.cirtual.data.Profile;
 import com.cirtual.data.ProfileDao;
@@ -42,7 +46,9 @@ public class OperationController {
 			return "User alreay exsists. Please use a different username";
 
 		try {
-			Users newUser = new Users(username.toLowerCase(), password);
+			BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+			String hashedPassword = passwordEncoder.encode(password);
+			Users newUser = new Users(username.toLowerCase(),hashedPassword);
 			userDAO.save(newUser);
 			id = String.valueOf(newUser.getId());
 		} catch (Exception ex) {
@@ -53,43 +59,43 @@ public class OperationController {
 	}
 
 	// Send Message
-	@RequestMapping(method = RequestMethod.POST, value = "/sendmessage")
-	public String sendMessage(@RequestParam(value = "username") String username,
-			@RequestParam(value = "password") String password, @RequestParam(value = "toUser") String toUser,
-			@RequestParam(value = "message") String message) {
-
-		String chatID = "";
-
-		if (username == null)
-			return "User Name cannot be  null";
-		if (toUser == null)
-			return "Sender Name cannot be  null";
-
-		Users checkUser = userDAO.findByUsername(username);
-		Users checkToUser = userDAO.findByUsername(toUser);
-
-		if (checkUser == null)
-			return "User does not exsist in Database";
-		if (checkToUser == null)
-			return "Sender does not exsist in Database";
-		if (!checkUser.getPassword().equals(password))
-			return "Password does not match the username";
-
-		Messages newMessage = new Messages(checkToUser.getId(), checkUser.getId(), message);
-		System.out.println(newMessage.toString());
-
-		messageDAO.save(newMessage);
-		chatID = String.valueOf(newMessage.getId());
-
-		return "Message sent successfully with ID : " + chatID + " at : " + newMessage.getSent_at();
-
-	}
+//	@RequestMapping(method = RequestMethod.POST, value = "/sendmessage")
+//	public String sendMessage(@RequestParam(value = "username") String username,
+//			@RequestParam(value = "password") String password, @RequestParam(value = "toUser") String toUser,
+//			@RequestParam(value = "message") String message) {
+//
+//		String chatID = "";
+//
+//		if (username == null)
+//			return "User Name cannot be  null";
+//		if (toUser == null)
+//			return "Sender Name cannot be  null";
+//
+//		Users checkUser = userDAO.findByUsername(username);
+//		Users checkToUser = userDAO.findByUsername(toUser);
+//
+//		if (checkUser == null)
+//			return "User does not exsist in Database";
+//		if (checkToUser == null)
+//			return "Sender does not exsist in Database";
+//		if (!checkUser.getPassword().equals(password))
+//			return "Password does not match the username";
+//
+//		Messages newMessage = new Messages(checkToUser.getId(), checkUser.getId(), message);
+//		System.out.println(newMessage.toString());
+//
+//		messageDAO.save(newMessage);
+//		chatID = String.valueOf(newMessage.getId());
+//
+//		return "Message sent successfully with ID : " + chatID + " at : " + newMessage.getSent_at();
+//
+//	}
 
 	// Get Messages . Here we will overload method with different parameters
 
 	// Method will get unread messages from all users.
 	@RequestMapping(method = RequestMethod.POST, value = "/getunreadmessages")
-	public List<Messages> getMessages(@RequestParam(value = "username") String username,
+	public List<MessageProjection> getMessages(@RequestParam(value = "username") String username,
 			@RequestParam(value = "password") String password) {
 
 		if (username == null)
@@ -98,8 +104,12 @@ public class OperationController {
 		Users checkUser = userDAO.findByUsername(username);
 		if (checkUser == null)
 			return null;
+		
+		BCryptPasswordEncoder digestor = new BCryptPasswordEncoder();
+		if (!digestor.matches( password,checkUser.getPassword()))
+			return null;
 
-		List<Messages> unReadMessage = messageDAO.findByReadValAndUser1Id(0, checkUser.getId());
+		List<MessageProjection> unReadMessage = messageDAO.findByReadValAndUser1Id(0, checkUser.getId());
 		messageDAO.updateReadVal(checkUser.getId(), 1);
 
 		return unReadMessage;
@@ -107,12 +117,12 @@ public class OperationController {
 
 	// method will get unread messages from between timestamp provided.
 	@RequestMapping(method = RequestMethod.POST, value = "/getmessagesbytime")
-	public List<Messages> getMessages(@RequestParam(value = "username") String username,
+	public List<MessageProjection> getMessages(@RequestParam(value = "username") String username,
 			@RequestParam(value = "password") String password,
 			@RequestParam(value = "startTime") String startTimeString,
 			@RequestParam(value = "endTime") String endTimeString) {
 
-		List<Messages> unReadMessage = null;
+		List<MessageProjection> unReadMessage = null;
 		if (username == null)
 			return null;
 
@@ -120,6 +130,10 @@ public class OperationController {
 		if (checkUser == null)
 			return null;
 
+		BCryptPasswordEncoder digestor = new BCryptPasswordEncoder();
+		if (!digestor.matches( password,checkUser.getPassword()))
+			return null;
+		
 		try {
 			DateFormat formatter;
 			formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
@@ -138,16 +152,20 @@ public class OperationController {
 
 	// method will get messages from particular users.
 	@RequestMapping(method = RequestMethod.POST, value = "/getmessagesbyuser")
-	public List<Messages> getMessages(@RequestParam(value = "username") String username,
+	public List<MessageProjection> getMessages(@RequestParam(value = "username") String username,
 			@RequestParam(value = "password") String password, @RequestParam(value = "user2") String user2) {
 
-		List<Messages> unReadUserMessage = null;
+		List<MessageProjection> unReadUserMessage = null;
 		if (username == null || user2 == null)
 			return null;
 
 		Users checkUser = userDAO.findByUsername(username);
 		Users otherUser = userDAO.findByUsername(user2);
 		if (checkUser == null || otherUser == null)
+			return null;
+		
+		BCryptPasswordEncoder digestor = new BCryptPasswordEncoder();
+		if (!digestor.matches( password,checkUser.getPassword()))
 			return null;
 
 		unReadUserMessage = messageDAO.findByUser1IdAndUser2Id(checkUser.getId(), otherUser.getId());
@@ -157,16 +175,20 @@ public class OperationController {
 
 	// method will all messages from all users.
 	@RequestMapping(method = RequestMethod.POST, value = "/getallmessages")
-	public List<Messages> getAllMessages(@RequestParam(value = "username") String username,
+	public List<MessageProjection> getAllMessages(@RequestParam(value = "username") String username,
 			@RequestParam(value = "password") String password) {
 
-		List<Messages> allMessages = null;
+		List<MessageProjection> allMessages = null;
 		if (username == null)
 			return null;
 
 		Users checkUser = userDAO.findByUsername(username);
 
 		if (checkUser == null)
+			return null;
+		
+		BCryptPasswordEncoder digestor = new BCryptPasswordEncoder();
+		if (!digestor.matches( password,checkUser.getPassword()))
 			return null;
 
 		allMessages = messageDAO.findByUser1Id(checkUser.getId());
@@ -179,6 +201,7 @@ public class OperationController {
 	public List<String> listAllUsers(@RequestParam(value = "username") String username,
 			@RequestParam(value = "password") String password) {
 
+		
 		if (username == null)
 			return null;
 
@@ -186,8 +209,8 @@ public class OperationController {
 
 		if (checkUser == null)
 			return null;
-
-		if (!checkUser.getPassword().equals(password))
+		BCryptPasswordEncoder digestor = new BCryptPasswordEncoder();
+		if (!digestor.matches( password,checkUser.getPassword()))
 			return null;
 
 		return userDAO.findAllUsers();
@@ -236,8 +259,9 @@ public class OperationController {
 
 		if (checkUser == null)
 			return "User does not exsist in Database";
-		if (!checkUser.getPassword().equals(password))
-			return "Password does not match the username";
+		BCryptPasswordEncoder digestor = new BCryptPasswordEncoder();
+		if (!digestor.matches( password,checkUser.getPassword()))
+			return "Password does not match";
 
 		if ((phone != null || !phone.equals("")) && phone.length() != 10)
 			return "phone number must be 10 digits";
@@ -267,8 +291,9 @@ public class OperationController {
 
 		if (checkUser == null)
 			return "User does not exsist in Database";
-		if (!checkUser.getPassword().equals(password))
-			return "Password does not match the username";
+		BCryptPasswordEncoder digestor = new BCryptPasswordEncoder();
+		if (!digestor.matches( password,checkUser.getPassword()))
+			return "Password does not match";
 
 		if (phone.length() != 10)
 			return "phone number must be 10 digits";
