@@ -11,6 +11,7 @@ import org.springframework.data.repository.query.Param;
 @Transactional
 public interface ProfileDao extends JpaRepository<Profile, Long>{
 	Profile findByUserid(int userid);
+	ProfileProjection findByIdprofile(int idprofile);
 	
 	@Query(value = "SELECT p.firstname FROM Profile p WHERE p.firstname LIKE %?1% ")
 	public List<String> findFirstnameLike(@Param("pattern") String pattern);

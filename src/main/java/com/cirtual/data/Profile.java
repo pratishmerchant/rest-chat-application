@@ -35,7 +35,7 @@ public class Profile {
 	
 	@NotNull
 	@Column(name = "phone")
-	private double phone;
+	private String phone;
 	
 	
 
@@ -46,7 +46,7 @@ public class Profile {
 
 
 
-	public Profile(int userid, String firstname, String lastname, double phone) {
+	public Profile(int userid, String firstname, String lastname, String phone) {
 		super();
 		this.userid = userid;
 		this.firstname = firstname;
@@ -102,13 +102,13 @@ public class Profile {
 
 
 
-	public double getPhone() {
+	public String getPhone() {
 		return phone;
 	}
 
 
 
-	public void setPhone(double phone) {
+	public void setPhone(String phone) {
 		this.phone = phone;
 	}
 	

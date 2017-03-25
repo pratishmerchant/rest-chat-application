@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.cirtual.data.MessageDao;
 import com.cirtual.data.Profile;
 import com.cirtual.data.ProfileDao;
+import com.cirtual.data.ProfileProjection;
 import com.cirtual.data.UserDao;
 import com.cirtual.data.Users;
 import com.cirtual.operations.service.TokenService;
@@ -25,11 +26,15 @@ import com.cirtual.operations.service.TokenService;
  * @version : 1.0.0
  */
 
+
 @RestController
 public class ProfileController {
 
 	@Autowired
 	private ProfileDao profileDAO;
+	
+	@Autowired
+	private UserDao userDAO;
 
 	@Autowired
 	private TokenService tokenService;
@@ -54,7 +59,7 @@ public class ProfileController {
 	 * @return returns successful message with profileID.
 	 */
 
-	@RequestMapping("/create-profile")
+	@RequestMapping(method = RequestMethod.POST, value = "/create-profile")
 	public String createProfile(@RequestParam(value = "tokenId") String tokenId,
 			@RequestParam(value = "firstname") String firstname, @RequestParam(value = "lastname") String lastname,
 			@RequestParam(value = "phone") String phone) {
@@ -68,13 +73,13 @@ public class ProfileController {
 		}
 		// Assumption Country US and no extension
 		Object o = phone;
-		if ((phone != null || !phone.equals("")) && phone.length() != 10 && (o instanceof Integer))
-			return "phone number must be 10 digits";
+		if (!phone.equals("") && phone.length() != 10 && (o instanceof Integer))
+		
 		try {
 			Profile checkProfile = profileDAO.findByUserid(userId);
 
 			if (checkProfile == null) {
-				Profile newProfile = new Profile(userId, firstname, lastname, Double.parseDouble(phone));
+				Profile newProfile = new Profile(userId, firstname, lastname, phone);
 				System.out.println(newProfile.toString());
 				profileDAO.save(newProfile);
 				profileID = String.valueOf(newProfile.getIdprofile());
@@ -82,7 +87,7 @@ public class ProfileController {
 			}
 			checkProfile.setFirstname(firstname);
 			checkProfile.setLastname(lastname);
-			checkProfile.setPhone(Double.parseDouble(phone));
+			checkProfile.setPhone(phone);
 
 			profileDAO.save(checkProfile);
 
@@ -92,6 +97,43 @@ public class ProfileController {
 			return "Error in creating profile";
 		}
 		return "Profile updated successfully for " + profileID;
+
+	}
+	
+	/**
+	 * End-point : /view-profile.
+	 * It is used to view a profile provided we know the username of that user and the user profile is setup.
+	 * 
+	 * 
+	 * @param tokenId A unique identifier for a particular registered user.
+	 * @param user2 username of the other user
+	 * @return Returns the firstname , lastname and phone number
+	 */
+	
+	@RequestMapping("/view-profile")
+	public ProfileProjection viewProfile(@RequestParam(value = "username") String username) {
+		ProfileProjection user2Profile  = null;
+		
+		if (username == null)
+			return null;
+
+		Users otherUser = userDAO.findByUsername(username);
+		if (otherUser == null)
+			return null;
+
+		try {
+			Profile checkProfile = profileDAO.findByUserid(otherUser.getId());
+
+			if (checkProfile == null) {
+				return null;
+			}
+			
+			user2Profile = profileDAO.findByIdprofile(checkProfile.getIdprofile());
+			System.out.println(user2Profile.getFirstname() +" " +user2Profile.getLastname()+" "+user2Profile.getPhone());
+		} catch (Exception e) {
+			return null;
+		}
+		return user2Profile;
 
 	}
 
