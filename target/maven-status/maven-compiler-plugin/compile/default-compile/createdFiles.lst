@@ -1,6 +1,6 @@
 com\cirtual\data\MessageDao.class
-com\cirtual\data\Users.class
-com\cirtual\data\UserDao.class
 com\cirtual\data\Messages.class
 com\cirtual\Application.class
+com\cirtual\data\Users.class
+com\cirtual\data\UserDao.class
 com\cirtual\operations\OperationController.class

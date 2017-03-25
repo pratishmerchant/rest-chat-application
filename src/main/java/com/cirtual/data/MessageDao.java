@@ -11,13 +11,17 @@ import org.springframework.data.repository.CrudRepository;
 
 
 
+/**
+ * @author Pratish
+ * 
+ */
 @Transactional
 public interface MessageDao extends CrudRepository<Messages, Long> {
-	public List<Messages> findByReadValAndUser1Id(int readVal,int user1Id);
-	public List<Messages> findTop10ByReadValAndUser1Id(int readVal,int user1Id);
-	public List<Messages> findByUser1IdAndSentAtBetween(int user1Id,Timestamp start,Timestamp end);
-	public List<Messages> findByUser1IdAndUser2Id(int user1Id,int user2Id);
-	public List<Messages> findByUser1Id(int user1Id);
+	public List<MessageProjection> findByReadValAndUser1Id(int readVal,int user1Id);
+	public List<MessageProjection> findTop10ByReadValAndUser1Id(int readVal,int user1Id);
+	public List<MessageProjection> findByUser1IdAndSentAtBetween(int user1Id,Timestamp start,Timestamp end);
+	public List<MessageProjection> findByUser1IdAndUser2Id(int user1Id,int user2Id);
+	public List<MessageProjection> findByUser1Id(int user1Id);
 
 	@Modifying
 	@Query("UPDATE Messages m SET m.readVal = ?2 WHERE m.user1Id = ?1")
