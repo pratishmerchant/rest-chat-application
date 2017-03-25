@@ -15,6 +15,15 @@ import com.cirtual.data.UsernameProjection;
 import com.cirtual.data.Users;
 import com.cirtual.operations.service.TokenService;
 
+
+/**
+ * End point to search for Users based on username and if profile is setup with First and Last Name.
+ * 
+ * @author Pratish
+ * @version : 1.0.0
+ */
+
+
 @RestController
 public class SearchUsersController {
 	@Autowired
@@ -27,6 +36,19 @@ public class SearchUsersController {
 	private TokenService tokenService;
 
 	// method to search all users.
+	
+	/**End-point : /search-users
+	 * <p>
+	 * Service to search for other users using partial match on username. If profile exists then on first and lastname as well.  
+	 * <p>
+	 * 
+	 * @param tokenId A unique identifier for a particular registered user.
+	 * @param pattern Partial string that will be used to query
+	 * @return List of usernames.
+	 * 
+	 */
+	
+	
 	@RequestMapping(method = RequestMethod.POST, value = "/search-users")
 	public List<String> searchUsers(@RequestParam(value = "tokenId") String tokenId,
 			@RequestParam(value = "pattern") String pattern) {

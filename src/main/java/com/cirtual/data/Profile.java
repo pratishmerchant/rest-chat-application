@@ -8,9 +8,15 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
+/**
+ * An optional functionality to map a user information by creating a profile. Limited to firstname lastname and phone number for now.
+ * @author Pratish
+ *
+ */
 @Entity
 @Table(name = "profile")
 public class Profile {
+	
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int idprofile;

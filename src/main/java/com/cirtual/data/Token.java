@@ -10,6 +10,14 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
+
+
+/**
+ * Maps to token table in db. Stores generated token with its timestamp
+ * 
+ * @author Pratish
+ * @version 1.0.0
+ */
 @Entity
 @Table(name = "token")
 public class Token {

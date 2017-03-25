@@ -15,6 +15,15 @@ import com.cirtual.data.TokenDao;
 import com.cirtual.data.UserDao;
 import com.cirtual.data.Users;
 
+
+/**
+ * End point to generate a unique token which is valid for 10 mins and used for further services.
+ * 
+ * @author Pratish
+ * @version : 1.0.0
+ */
+
+
 @RestController
 public class TokenController {
 
@@ -26,8 +35,20 @@ public class TokenController {
 
 	// Generate token
 
+	/**End-point : /generate-token
+	 * <p>
+	 * Endpoint service for generating tokenId based which is valid 10 mins. 
+	 * <p>
+	 * The user need to be registered in order to generate token.
+	 * @param username Username should be unique and not more than 45 characters.
+	 * @param password Password should be greater than 6 characters.Stores securely as a Hash.(No other checks)
+	 * @return Returns a unique tokenId 
+	 * 
+	 */
+	
+	
 	@RequestMapping(method = RequestMethod.POST, value = "/generate-token")
-	public String register(@RequestParam(value = "username") String username,
+	public String generateToken(@RequestParam(value = "username") String username,
 			@RequestParam(value = "password") String password) {
 
 		UUID token = null;

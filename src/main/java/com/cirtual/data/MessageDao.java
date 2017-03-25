@@ -11,6 +11,10 @@ import org.springframework.data.repository.CrudRepository;
 
 
 
+/**
+ * @author Pratish
+ * 
+ */
 @Transactional
 public interface MessageDao extends CrudRepository<Messages, Long> {
 	public List<MessageProjection> findByReadValAndUser1Id(int readVal,int user1Id);

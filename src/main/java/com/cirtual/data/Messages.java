@@ -12,6 +12,12 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
+/**
+ * Maps to messages. Stores the users id's of sender and reciver along with message timestamp . Also maintains a count of read and unread messages.
+ *  
+ * @author Pratish
+ * @version 1.0.0
+ */
 @Entity
 @Table(name="messages")
 public class Messages {

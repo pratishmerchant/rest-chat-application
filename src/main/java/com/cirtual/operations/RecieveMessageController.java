@@ -20,6 +20,15 @@ import com.cirtual.data.UserDao;
 import com.cirtual.data.Users;
 import com.cirtual.operations.service.TokenService;
 
+
+/**
+ * End point for viewing received messages . Currently 4 different options to view messages : unread , between timestamp, by user and all messages.
+ *  
+ * @author Pratish
+ * @version : 1.0.0
+ */
+
+
 @RestController
 public class RecieveMessageController {
 	@Autowired
@@ -32,8 +41,17 @@ public class RecieveMessageController {
 	private TokenService tokenService;
 
 	// Method will get unread messages from all users.
+	
+	/**End-point : /get-unread-messages
+	 * <p>
+	 * This method provides user with all unread messages. 
+	 * <p>
+	 * @param tokenId  A unique identifier for a particular registered user.
+	 * @return List of messages as json with timestamp
+	 * 
+	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/get-unread-messages")
-	public List<MessageProjection> getMessages(@RequestParam(value = "tokenId") String tokenId) {
+	public List<MessageProjection> getMessages(@RequestParam(value = "tokenId") String tokenId){
 
 		List<MessageProjection> unReadMessage = null;
 		int userId = -1;
@@ -51,6 +69,19 @@ public class RecieveMessageController {
 	}
 
 	// method will get messages between timestamp provided.
+
+	/**End-point : /get-messages-by-time
+	 * <p>
+	 * This method provides user with all  messages between timestamp interval values. 
+	 * <p>
+	 * @param tokenId  A unique identifier for a particular registered user.
+	 * @param startTimeString Timestamp for start of the interval
+	 * @param endTimeString	Timestamp for end of interval
+	 * @return List of message as json with timestamp
+	 *
+	 */
+	
+	
 	@RequestMapping(method = RequestMethod.POST, value = "/get-messages-by-time")
 	public List<MessageProjection> getMessages(@RequestParam(value = "tokenId") String tokenId,
 			@RequestParam(value = "startTime") String startTimeString,
@@ -81,6 +112,18 @@ public class RecieveMessageController {
 	}
 
 	// method will get messages from particular users.
+	
+	/**End-point : /get-messages-by-user
+	 * <p>
+	 * This method provides user with all messages from another user. 
+	 * <p>
+	 * @param tokenId A unique identifier for a particular registered user.
+	 * @param user2  Username of another user , which can be found using list or search user
+	 * @return List of message as json with timestamp
+	 * 
+	 */
+	
+	
 	@RequestMapping(method = RequestMethod.POST, value = "/get-messages-by-user")
 	public List<MessageProjection> getMessages(@RequestParam(value = "tokenId") String tokenId,
 			@RequestParam(value = "user2") String user2) {
@@ -107,6 +150,16 @@ public class RecieveMessageController {
 	}
 
 	// method will all messages from all users.
+	/**End-point : /get-all-messages
+	 * <p> 
+	 * This method provides user with all messages. 
+	 * <p>
+	 * @param tokenId List of message as json with timestamp
+	 * @return List of message as json with timestamp
+	 * 
+	 */
+	
+	
 	@RequestMapping(method = RequestMethod.POST, value = "/get-all-messages")
 	public List<MessageProjection> getAllMessages(@RequestParam(value = "tokenId") String tokenId) {
 

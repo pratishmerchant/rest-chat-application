@@ -13,6 +13,16 @@ import com.cirtual.data.Users;
 import com.cirtual.operations.service.TokenService;
 
 
+
+/**
+ * 
+ * End point to send message to a particular user using username.
+ * 
+ * @author Pratish
+ * @version : 1.0.0
+ */
+
+
 @RestController
 public class SendMessageController {
 	@Autowired
@@ -25,6 +35,19 @@ public class SendMessageController {
 	private TokenService tokenService;
 
 	// Send Message
+	/**End-point : /send-message
+	 * <p>
+	 * Endpoint service for sending messages to a particular user using their username. 
+	 * <p>
+	 * Can use listAllUsers or searchUsers to find username. 
+	 * @param tokenId A unique identifier for a particular registered user.
+	 * @param toUser Username of the person whom the message will be directed to 
+	 * @param message Text that will contain message text
+	 * @return mesageid would be reported for succesfully transmission.
+	 * 
+	 */
+	
+	
 	@RequestMapping(method = RequestMethod.POST, value = "/send-message")
 	public String sendMessage(@RequestParam(value = "tokenId") String tokenId,
 			@RequestParam(value = "toUser") String toUser, @RequestParam(value = "message") String message) {
